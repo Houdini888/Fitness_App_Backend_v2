@@ -1,15 +1,20 @@
-from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
-from django.contrib.auth import authenticate
-from .models import User
-import json
-import jwt
-
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+from .token_logic import get_user_from_token, get_token_from_header
+
 from django.contrib.auth import authenticate
+
+from .serializers import UserSerializer
+
+#from .models import User
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class RegistrationView(APIView):
@@ -19,7 +24,7 @@ class RegistrationView(APIView):
             return Response({'error': 'Email already exists'}, status=400)
 
         try:
-            User.objects.create_user(
+            user = User.objects.create_user(
                 email=request.data.get('email'),
                 password=request.data.get('password'),
                 gender=request.data.get('gender'),
@@ -32,6 +37,24 @@ class RegistrationView(APIView):
 
         return Response({'message': 'Registration successful!'}, status=200)
 
+class GetUserData(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            token = get_token_from_header(request)
+            user = get_user_from_token(token)
+
+            if user:
+                serializer = UserSerializer(user)
+                user_data = serializer.data
+                return Response(user_data)
+            else:
+                return Response({'error': 'User not foundGet'})
+
+        except:
+            return Response({'error': 'Authentication failed'})
 
 class LoginView(APIView):
     def post(self, request):
