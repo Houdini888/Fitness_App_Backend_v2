@@ -26,7 +26,7 @@ class Product(models.Model):
 
     kcal = models.IntegerField()
     isVerified = models.BooleanField()
-    creator_user = models.ForeignKey(User, on_delete=models.CASCADE)
+    creator_user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
 
 class Meal(models.Model):
 
