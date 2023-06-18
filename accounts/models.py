@@ -4,9 +4,12 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
+    def create_user(self, email, password = None, **extra_fields):
         # Normalize the email address
         email = self.normalize_email(email)
+
+        if not password:
+            raise ValueError('Password is required!')
 
         # Create a new User instance
         user = self.model(email=email, **extra_fields)
