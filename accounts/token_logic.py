@@ -26,3 +26,12 @@ def get_user_from_token(token) -> User:
         return user
     except (jwt.DecodeError, User.DoesNotExist):
         return None
+
+def authenticate_user_from_token(request) -> User:
+    token = get_token_from_header(request)
+    user = get_user_from_token(token)
+
+    if user:
+        return user
+    else:
+        raise AuthenticationFailed('User authentication failed')

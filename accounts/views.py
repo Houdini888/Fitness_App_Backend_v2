@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from .token_logic import get_user_from_token, get_token_from_header
+from .token_logic import authenticate_user_from_token
 
 from django.contrib.auth import authenticate
 
@@ -37,14 +37,26 @@ class RegistrationView(APIView):
 
         return Response({'message': 'Registration successful!'}, status=200)
 
+# class ChangePasswordView(APIView):
+#     authentication_classes = [JWTAuthentication]
+#     permission_classes = [IsAuthenticated]
+#
+#     def patch(self, request):
+#         try:
+#             token = get_token_from_header(request)
+#             user = get_user_from_token(token)
+#
+#             if user:
+
+
 class GetUserData(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         try:
-            token = get_token_from_header(request)
-            user = get_user_from_token(token)
+
+            user = authenticate_user_from_token(request)
 
             if user:
                 serializer = UserSerializer(user)
