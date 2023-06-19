@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.exceptions import AuthenticationFailed
 
 from .token_logic import authenticate_user_from_token
 
@@ -37,17 +38,26 @@ class RegistrationView(APIView):
 
         return Response({'message': 'Registration successful!'}, status=200)
 
-# class ChangePasswordView(APIView):
-#     authentication_classes = [JWTAuthentication]
-#     permission_classes = [IsAuthenticated]
-#
-#     def patch(self, request):
-#         try:
-#             token = get_token_from_header(request)
-#             user = get_user_from_token(token)
-#
-#             if user:
+class ChangePasswordView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
+    def patch(self, request):
+        try:
+            user = authenticate_user_from_token(request)
+
+            if user:
+                old_password = request.data.get('old_password')
+                new_password = request.data.get('new_password')
+
+                if user.check_password(old_password):
+                    user.set_password(new_password)
+                    user.save()
+                    return Response({'message': 'Password changed successfully'})
+                else:
+                    return Response({'error': 'The old password is incorrect!'}, status=400)
+        except:
+            return Response({'error': 'User authentication failed'})
 
 class GetUserData(APIView):
     authentication_classes = [JWTAuthentication]
