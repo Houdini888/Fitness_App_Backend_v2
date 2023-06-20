@@ -186,6 +186,32 @@ class GetMealsBetweenDates(APIView):
 
         return Response(user_meals_json)
 
+#get request with meal ID and return this meal with all elements
+class GetMeal(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = authenticate_user_from_request(request)
+
+        if user:
+            try:
+                meal_id = request.data.get('meal_id')
+                meal = Meal.objects.get(id=meal_id)
+
+                serializer = MealSerializer(meal)
+
+                meal_json = serializer.data
+
+            except Exception as e:
+                print(e)
+                return Response({'error': str(e)}, status=400)
+        else:
+            return Response({'error': 'User authentication failed'}, status=400)
+
+        return Response(meal_json)
+
+
 
 
 

@@ -9,4 +9,5 @@ urlpatterns = [
     path('product-with-title/', views.GetProductsByTitle.as_view(), name='get_products_by_title'),
     path('product/', views.GetProduct.as_view(), name='product'),
     path('meals-in-range/', views.GetMealsBetweenDates.as_view(), name='meals-in-range'),
+    path('get-meal/', views.GetMeal.as_view(), name='get-meal'),
 ]
