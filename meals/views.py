@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from accounts.token_logic import authenticate_user_from_token
+from accounts.token_logic import authenticate_user_from_request
 
 from .models import Product, Meal, MealElement
 
@@ -21,7 +21,7 @@ class AddMealView(APIView):
     def post(self, request):
 
 
-            user = authenticate_user_from_token(request)
+            user = authenticate_user_from_request(request)
 
             if user:
                 try:
@@ -64,7 +64,7 @@ class AddProductToMeal(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        user = authenticate_user_from_token(request)
+        user = authenticate_user_from_request(request)
 
         if user:
             try:
@@ -81,4 +81,28 @@ class AddProductToMeal(APIView):
                 return Response({'error': 'Invalid meal or product data'}, status=400)
 
             return Response({'message': 'Product successfully added to meal'})
+
+#get request with meal_id and product_id, then remove product from meal
+class RemoveProductFromMeal(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        user = authenticate_user_from_request(request)
+
+        if user:
+            try:
+                meal_id = request.data.get('meal_id')
+                product_id = request.data.get('product_id')
+
+                meal = Meal.objects.get(id=meal_id)
+                product = Product.objects.get(id=product_id)
+
+                elements_to_delete = MealElement.objects.filter(meal=meal, product=product)
+                elements_to_delete.delete()
+            except:
+                return Response({'error': 'Invalid meal or product data'}, status=400)
+
+        return Response({'message': 'Product successfully removed from meal'})
+
 
