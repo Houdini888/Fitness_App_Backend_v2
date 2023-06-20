@@ -210,11 +210,37 @@ class GetMeal(APIView):
 
             except Exception as e:
                 print(e)
-                return Response({'error': str(e)}, status=400)
+                return Response({'error': 'Invalid meal ID'}, status=400)
         else:
             return Response({'error': 'User authentication failed'}, status=400)
 
         return Response(meal_json)
+
+class AddProduct(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = authenticate_user_from_request(request)
+
+        if user:
+            try:
+                Product.objects.create(
+                    title=request.data.get('title'),
+                    measure_type=request.data.get('measure_type'),
+                    kcal=request.data.get('kcal'),
+                    isVerified=False,
+                    creator_user=user
+                )
+            except Exception as e:
+                print(e)
+                return Response({'error': str(e)}, status=400)
+
+        else:
+            return Response({'error': 'User authentication failed'}, status=400)
+
+        return Response({'message': 'Product added successfully'})
+
 
 
 
