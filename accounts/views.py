@@ -12,7 +12,7 @@ from django.contrib.auth import authenticate
 
 from .serializers import UserSerializer
 
-#from .models import User
+# from .models import User
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -38,6 +38,7 @@ class RegistrationView(APIView):
 
         return Response({'message': 'Registration successful!'}, status=200)
 
+
 class ChangePasswordView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -59,13 +60,13 @@ class ChangePasswordView(APIView):
         except:
             return Response({'error': 'User authentication failed'}, status=400)
 
+
 class GetUserData(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
+    def post(self, request):
         try:
-
             user = authenticate_user_from_request(request)
 
             if user:
@@ -77,6 +78,34 @@ class GetUserData(APIView):
 
         except:
             return Response({'error': 'Authentication failed'})
+
+
+class UpdateUserData(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    allowed_methods = ['PATCH']
+    def patch(self, request):
+        try:
+            user_email = authenticate_user_from_request(request)
+
+            if not user_email:
+                return Response({'error': 'Invalid token'})
+
+            user = User.objects.get(email=user_email)
+
+            user.update_details(
+                gender=request.data.get('gender', user.gender),
+                date_of_birth=request.data.get('date_of_birth', user.date_of_birth),
+                weight=request.data.get('weight', user.weight),
+                height=request.data.get('height', user.height)
+            )
+            user.save()
+        except Exception as error:
+            print(error)
+            return Response({'error': 'Bad request'}, 400)
+
+        return Response()
+
 
 class LoginView(APIView):
     def post(self, request):
@@ -94,6 +123,7 @@ class LoginView(APIView):
             })
         else:
             return Response({'error': 'Invalid credentials'}, status=400)
+
 
 @api_view()
 def index(request):

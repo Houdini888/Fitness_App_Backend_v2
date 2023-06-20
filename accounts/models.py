@@ -51,3 +51,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = []
 
     objects = UserManager()
+
+    def update_details(self, gender, date_of_birth, weight, height):
+        self.date_of_birth = date_of_birth
+        self.gender = gender
+        self.weight = weight
+        self.height = height
