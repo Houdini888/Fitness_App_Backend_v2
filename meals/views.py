@@ -123,7 +123,8 @@ class GetProductsByTitle(APIView):
 
                 n_products = Product.objects.filter(title__contains=title_part)[:n]
 
-                n_products_json = serializers.serialize('json', n_products)
+                serializer = ProductSerializer(n_products, many=True)
+                n_products_json = serializer.data
 
             except:
                 return Response({'error': 'Invalid title or number of products'}, status=400)
