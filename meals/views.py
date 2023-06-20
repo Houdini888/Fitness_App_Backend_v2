@@ -35,7 +35,8 @@ class AddMealView(APIView):
                     creation_date=date.today(),
                     creator_user=user,
                 )
-            except:
+            except Exception as e:
+                print(e)
                 return Response({'error': 'Invalid meal data'}, status=400)
 
             # products_id_quant_list is a list of dicts with keys {product_id, quantity}
@@ -78,7 +79,8 @@ class AddProductToMeal(APIView):
                 product = Product.objects.get(id=product_id)
 
                 MealElement.objects.create(product=product, meal=meal, quantity=quantity)
-            except:
+            except Exception as e:
+                print(e)
                 return Response({'error': 'Invalid meal or product data'}, status=400)
 
             return Response({'message': 'Product successfully added to meal'})
@@ -101,7 +103,8 @@ class RemoveProductFromMeal(APIView):
 
                 elements_to_delete = MealElement.objects.filter(meal=meal, product=product)
                 elements_to_delete.delete()
-            except:
+            except Exception as e:
+                print(e)
                 return Response({'error': 'Invalid meal or product data'}, status=400)
         else:
             return Response({'error': 'User authentication failed'}, status=400)
@@ -126,8 +129,8 @@ class GetProductsByTitle(APIView):
                 serializer = ProductSerializer(n_products, many=True)
                 n_products_json = serializer.data
 
-            except Exception as error:
-                print(error)
+            except Exception as e:
+                print(e)
                 return Response({'error': 'Invalid title or number of products'}, status=400)
         else:
             return Response({'error': 'User authentication failed'}, status=400)
@@ -151,7 +154,8 @@ class GetProduct(APIView):
                 serializer = ProductSerializer(product)
                 product_json = serializer.data
 
-            except:
+            except Exception as e:
+                print(e)
                 return Response({'error': 'Invalid product ID'}, status=400)
 
         else:
@@ -180,7 +184,7 @@ class GetMealsBetweenDates(APIView):
 
             except Exception as e:
                 print(e)
-                return Response({'error': str(e)}, status=400)
+                return Response({'error': 'Invalid dates or user meals'}, status=400)
         else:
             return Response({'error': 'User authentication failed'}, status=400)
 
