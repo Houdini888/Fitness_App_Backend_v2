@@ -8,7 +8,7 @@ from django.core import serializers
 from accounts.token_logic import authenticate_user_from_request
 
 from .models import Product, Meal, MealElement
-from .serializers import ProductSerializer
+from .serializers import ProductSerializer, MealSerializer
 
 from datetime import date
 import json
@@ -158,3 +158,35 @@ class GetProduct(APIView):
             return Response({'error': 'User authentication failed'}, status=400)
 
         return Response(product_json)
+
+#get request with start_date and end_date and send all meals with all MealElements user created between these 2 dates
+class GetMealsBetweenDates(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = authenticate_user_from_request(request)
+
+        if user:
+            try:
+                start_date = request.GET['start_date']
+                end_date = request.GET['end_date']
+
+                user_meals = Meal.objects.filter(creator_user=user, creation_date__range=[start_date, end_date])
+
+                serializer = MealSerializer(user_meals, many=True)
+
+                user_meals_json = serializer.data
+
+            except Exception as e:
+                print(e)
+                return Response({'error': str(e)}, status=400)
+        else:
+            return Response({'error': 'User authentication failed'}, status=400)
+
+        return Response(user_meals_json)
+
+
+
+
+
