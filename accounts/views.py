@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 
-from .token_logic import authenticate_user_from_token
+from .token_logic import authenticate_user_from_request
 
 from django.contrib.auth import authenticate
 
@@ -44,7 +44,7 @@ class ChangePasswordView(APIView):
 
     def patch(self, request):
         try:
-            user = authenticate_user_from_token(request)
+            user = authenticate_user_from_request(request)
 
             if user:
                 old_password = request.data.get('old_password')
@@ -66,7 +66,7 @@ class GetUserData(APIView):
     def get(self, request):
         try:
 
-            user = authenticate_user_from_token(request)
+            user = authenticate_user_from_request(request)
 
             if user:
                 serializer = UserSerializer(user)
