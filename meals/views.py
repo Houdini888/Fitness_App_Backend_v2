@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
+from django.core import serializers
+
 from accounts.token_logic import authenticate_user_from_request
 
 from .models import Product, Meal, MealElement
@@ -89,7 +91,6 @@ class RemoveProductFromMeal(APIView):
 
     def delete(self, request):
         user = authenticate_user_from_request(request)
-
         if user:
             try:
                 meal_id = request.data.get('meal_id')
@@ -102,7 +103,57 @@ class RemoveProductFromMeal(APIView):
                 elements_to_delete.delete()
             except:
                 return Response({'error': 'Invalid meal or product data'}, status=400)
+        else:
+            return Response({'error': 'User authentication failed'}, status=400)
 
         return Response({'message': 'Product successfully removed from meal'})
+
+#get request with beginning part of a title` and number of products to send, then send
+class GetProductsByTitle(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = authenticate_user_from_request(request)
+        if user:
+            try:
+                title_part = request.data.get('title_part')
+                n = request.data.get('number')
+
+                n_products = Product.objects.filter(title__contains=title_part)[:n]
+
+                n_products_json = serializers.serialize('json', n_products)
+
+            except:
+                return Response({'error': 'Invalid title or number of products'}, status=400)
+        else:
+            return Response({'error': 'User authentication failed'}, status=400)
+
+        return Response(n_products_json)
+
+#get request with product id and return product
+class GetProduct(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = authenticate_user_from_request(request)
+
+        if user:
+            try:
+
+                product_id = request.data.get('product_id')
+                product = Product.objects.get(id=product_id)
+
+                product_json = serializers.serialize('json', [product])
+            except:
+                return Response({'error': 'Invalid product ID'}, status=400)
+
+        else:
+            return Response({'error': 'User authentication failed'}, status=400)
+
+        return Response(product_json)
+
+
 
 
