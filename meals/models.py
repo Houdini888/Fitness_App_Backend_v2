@@ -1,5 +1,6 @@
 from django.db import models
 from enum import Enum
+from datetime import date
 
 
 from django.contrib.auth import get_user_model
@@ -32,9 +33,9 @@ class Meal(models.Model):
 
     title = models.CharField(unique=True, max_length=255)
     subtitle = models.TextField()
-    calories = models.IntegerField
+    calories = models.IntegerField(default=0)
 
-    creation_date = models.DateField
+    creation_date = models.DateField(default=date.today)
     creator_user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     product_list = models.ManyToManyField(Product, through='MealElement')
