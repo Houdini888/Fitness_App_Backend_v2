@@ -8,6 +8,7 @@ from django.core import serializers
 from accounts.token_logic import authenticate_user_from_request
 
 from .models import Product, Meal, MealElement
+from .serializers import ProductSerializer
 
 from datetime import date
 import json
@@ -145,7 +146,10 @@ class GetProduct(APIView):
                 product_id = request.data.get('product_id')
                 product = Product.objects.get(id=product_id)
 
-                product_json = serializers.serialize('json', [product])
+                #product_json = serializers.serialize('json', [product])
+                serializer = ProductSerializer(product)
+                product_json = serializer.data
+
             except:
                 return Response({'error': 'Invalid product ID'}, status=400)
 
