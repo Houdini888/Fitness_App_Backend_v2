@@ -57,7 +57,7 @@ class ChangePasswordView(APIView):
                 else:
                     return Response({'error': 'The old password is incorrect!'}, status=400)
         except:
-            return Response({'error': 'User authentication failed'})
+            return Response({'error': 'User authentication failed'}, status=400)
 
 class GetUserData(APIView):
     authentication_classes = [JWTAuthentication]
@@ -73,7 +73,7 @@ class GetUserData(APIView):
                 user_data = serializer.data
                 return Response(user_data)
             else:
-                return Response({'error': 'User not foundGet'})
+                return Response({'error': 'User not found'})
 
         except:
             return Response({'error': 'Authentication failed'})
