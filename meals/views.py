@@ -145,10 +145,9 @@ class GetProduct(APIView):
         if user:
             try:
 
-                product_id = request.data.get('product_id')
+                product_id = request.GET['product_id']
                 product = Product.objects.get(id=product_id)
 
-                #product_json = serializers.serialize('json', [product])
                 serializer = ProductSerializer(product)
                 product_json = serializer.data
 
@@ -197,7 +196,8 @@ class GetMeal(APIView):
 
         if user:
             try:
-                meal_id = request.data.get('meal_id')
+
+                meal_id = request.GET['meal_id']
                 meal = Meal.objects.get(id=meal_id)
 
                 serializer = MealSerializer(meal)
