@@ -8,7 +8,7 @@ from django.core import serializers
 from accounts.token_logic import authenticate_user_from_request
 
 from .models import Product, Meal, MealElement
-from .serializers import ProductSerializer, MealSerializer
+from .serializers import ProductSerializer, MealSerializerProductList, MealSerializerProductList_WithQuantity
 
 from datetime import date
 import json
@@ -178,7 +178,7 @@ class GetMealsBetweenDates(APIView):
 
                 user_meals = Meal.objects.filter(creator_user=user, creation_date__range=[start_date, end_date])
 
-                serializer = MealSerializer(user_meals, many=True)
+                serializer = MealSerializerProductList_WithQuantity(user_meals, many=True)
 
                 user_meals_json = serializer.data
 
@@ -204,7 +204,7 @@ class GetMeal(APIView):
                 meal_id = request.GET['meal_id']
                 meal = Meal.objects.get(id=meal_id)
 
-                serializer = MealSerializer(meal)
+                serializer = MealSerializerProductList(meal)
 
                 meal_json = serializer.data
 
