@@ -56,6 +56,29 @@ class AddMealView(APIView):
             else:
                 return Response({'error': 'User authentication failed'}, status=400)
 
-            return Response({'message': 'Meal added successfully'})
+            return Response({'message': 'Meal added successfully', 'meal_id': meal.id})
 
+#get request with meal_id, product_id and quantity and add product to meal's product_list
+class AddProductToMeal(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = authenticate_user_from_token(request)
+
+        if user:
+            try:
+
+                meal_id = request.data.get('meal_id')
+                product_id = request.data.get('product_id')
+                quantity = request.data.get('quantity')
+
+                meal = Meal.objects.get(id=meal_id)
+                product = Product.objects.get(id=product_id)
+
+                MealElement.objects.create(product=product, meal=meal, quantity=quantity)
+            except:
+                return Response({'error': 'Invalid meal or product data'}, status=400)
+
+            return Response({'message': 'Product successfully added to meal'})
 
