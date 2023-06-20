@@ -118,15 +118,16 @@ class GetProductsByTitle(APIView):
         user = authenticate_user_from_request(request)
         if user:
             try:
-                title_part = request.data.get('title_part')
-                n = request.data.get('number')
+                title = request.GET['title']
+                n = int(request.GET['count'])
 
-                n_products = Product.objects.filter(title__contains=title_part)[:n]
+                n_products = Product.objects.filter(title__contains=title)[:n]
 
                 serializer = ProductSerializer(n_products, many=True)
                 n_products_json = serializer.data
 
-            except:
+            except Exception as error:
+                print(error)
                 return Response({'error': 'Invalid title or number of products'}, status=400)
         else:
             return Response({'error': 'User authentication failed'}, status=400)
