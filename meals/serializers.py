@@ -8,16 +8,20 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'measure_type', 'kcal', 'isVerified']
 
 
-class ProductSerializer_WithQuantity(serializers.ModelSerializer):
+class ProductSerializer_WithElementData(serializers.ModelSerializer):
     quantity = serializers.SerializerMethodField()
+    meal_element_id = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ['id', 'creator_user', 'quantity',  'title', 'measure_type', 'kcal', 'isVerified']
+        fields = ['id', 'meal_element_id', 'creator_user', 'quantity',  'title', 'measure_type', 'kcal', 'isVerified']
 
     def get_quantity(self, instance):
         meal_element = MealElement.objects.filter(product=instance).first()
         return meal_element.quantity
+    def get_meal_element_id(self, instance):
+        meal_element = MealElement.objects.filter(product=instance).first()
+        return meal_element.id
 
 
 class MealElementSerializer(serializers.ModelSerializer):
@@ -35,7 +39,7 @@ class MealSerializerProductList(serializers.ModelSerializer):
         fields = ['id', 'title', 'calories', 'creation_date', 'product_list']
 
 class MealSerializerProductList_WithQuantity(serializers.ModelSerializer):
-    product_list = ProductSerializer_WithQuantity(many=True, read_only=True)
+    product_list = ProductSerializer_WithElementData(many=True, read_only=True)
 
     class Meta:
         model = Meal
