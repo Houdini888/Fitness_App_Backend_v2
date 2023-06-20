@@ -65,7 +65,7 @@ class GetUserData(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
+    def get(self, request):
         try:
             user = authenticate_user_from_request(request)
 
