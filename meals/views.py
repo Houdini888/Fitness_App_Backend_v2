@@ -225,13 +225,16 @@ class AddProduct(APIView):
 
         if user:
             try:
-                Product.objects.create(
+                product = Product.objects.create(
                     title=request.data.get('title'),
                     measure_type=request.data.get('measure_type'),
                     kcal=request.data.get('kcal'),
                     isVerified=False,
                     creator_user=user
                 )
+
+                serializer = ProductSerializer(product)
+                product_json = serializer.data
             except Exception as e:
                 print(e)
                 return Response({'error': str(e)}, status=400)
@@ -239,7 +242,7 @@ class AddProduct(APIView):
         else:
             return Response({'error': 'User authentication failed'}, status=400)
 
-        return Response({'message': 'Product added successfully'})
+        return Response(product_json)
 
 
 

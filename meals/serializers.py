@@ -5,7 +5,7 @@ from .models import Product, Meal, MealElement
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id', 'title', 'measure_type', 'kcal', 'isVerified']
+        fields = ['id', 'title', 'measure_type', 'kcal', 'isVerified', 'creator_user']
 
 
 class ProductSerializer_WithElementData(serializers.ModelSerializer):
