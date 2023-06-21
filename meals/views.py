@@ -57,11 +57,42 @@ class AddMealView(APIView):
 
 
         else:
-            return Response({'error': 'Invalid token'}, status=400)
+            return Response({'error': 'Invalid token'}, status=401)
         serializer = MealSerializerProductList(meal)
         meal_json = serializer.data
 
         return Response(meal_json)
+
+
+class DeleteMealView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        try:
+            user = authenticate_user_from_request(request)
+            meal_id = request.GET['id']
+
+            if not user:
+                return Response({'error': 'Invalid token'}, status=401)
+
+            meal = Meal.objects.filter(id=meal_id)
+
+            if not meal:
+                return Response({'error': f'No such meal with id {id}'}, 400)
+
+            meal = meal.filter(creator_user=user)
+
+            if not meal:
+                return Response({'error': 'Unauthorized meal deletion'}, 401)
+
+            meal.delete()
+
+        except Exception as exc:
+            print(exc)
+            return Response({'error': 'Bad request'}, 400)
+
+        return Response()
 
 
 # get request with meal_id, product_id and quantity and add product to meal's product_list
@@ -113,9 +144,9 @@ class RemoveProductFromMeal(APIView):
             return Response({'error': 'User authentication failed'}, status=400)
 
         return Response({'message': 'Product successfully removed from meal'})
-      
 
-#get request with beginning part of a title` and number of products to send, then send
+
+# get request with beginning part of a title` and number of products to send, then send
 class GetProductsByTitle(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -140,7 +171,8 @@ class GetProductsByTitle(APIView):
 
         return Response(n_products_json)
 
-#get request with product id and return product
+
+# get request with product id and return product
 class GetProduct(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -166,7 +198,8 @@ class GetProduct(APIView):
 
         return Response(product_json)
 
-#get request with start_date and end_date and send all meals with all MealElements user created between these 2 dates
+
+# get request with start_date and end_date and send all meals with all MealElements user created between these 2 dates
 class GetMealsBetweenDates(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -193,7 +226,8 @@ class GetMealsBetweenDates(APIView):
 
         return Response(user_meals_json)
 
-#get request with meal ID and return this meal with all elements
+
+# get request with meal ID and return this meal with all elements
 class GetMeal(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -218,6 +252,7 @@ class GetMeal(APIView):
             return Response({'error': 'User authentication failed'}, status=400)
 
         return Response(meal_json)
+
 
 class AddProduct(APIView):
     authentication_classes = [JWTAuthentication]
@@ -246,10 +281,3 @@ class AddProduct(APIView):
             return Response({'error': 'User authentication failed'}, status=400)
 
         return Response(product_json)
-
-
-
-
-
-
-
