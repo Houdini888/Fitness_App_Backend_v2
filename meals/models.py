@@ -33,7 +33,6 @@ class Meal(models.Model):
 
     title = models.CharField(unique=True, max_length=255)
     subtitle = models.TextField()
-    calories = models.IntegerField(default=0)
 
     creation_date = models.DateField(default=date.today)
     creator_user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -46,5 +45,5 @@ class MealElement(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     meal = models.ForeignKey(Meal, on_delete=models.CASCADE)
 
-    quantity = models.IntegerField()
+    quantity = models.FloatField()
 

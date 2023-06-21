@@ -36,14 +36,14 @@ class MealSerializerProductList(serializers.ModelSerializer):
 
     class Meta:
         model = Meal
-        fields = ['id', 'title', 'calories', 'creation_date', 'product_list']
+        fields = ['id', 'title', 'creation_date', 'product_list']
 
 class MealSerializerProductList_WithQuantity(serializers.ModelSerializer):
     product_list = ProductSerializer_WithElementData(many=True, read_only=True)
 
     class Meta:
         model = Meal
-        fields = ['id', 'title', 'calories', 'creation_date', 'product_list']
+        fields = ['id', 'title', 'creation_date', 'product_list']
 
 
 

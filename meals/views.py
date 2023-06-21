@@ -31,7 +31,6 @@ class AddMealView(APIView):
                 meal = Meal.objects.create(
                     title=request.data.get('title'),
                     subtitle=request.data.get('subtitle'),
-                    calories=request.data.get('calories'),
                     creation_date=date.today(),
                     creator_user=user,
                 )
