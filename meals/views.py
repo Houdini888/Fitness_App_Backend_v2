@@ -127,7 +127,7 @@ class GetProductsByTitle(APIView):
                 title = request.GET['title']
                 n = int(request.GET['count'])
 
-                n_products = Product.objects.filter(title__contains=title)[:n]
+                n_products = Product.objects.filter(title__icontains=title)[:n]
 
                 serializer = ProductSerializer(n_products, many=True)
                 n_products_json = serializer.data
