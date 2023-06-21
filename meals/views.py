@@ -8,7 +8,7 @@ from django.core import serializers
 from accounts.token_logic import authenticate_user_from_request
 
 from .models import Product, Meal, MealElement
-from .serializers import ProductSerializer, MealSerializerProductList, MealSerializerProductList_WithQuantity
+from .serializers import ProductSerializer, MealSerializerProductList, MealSerializerProductList_WithElementData
 
 from datetime import date
 import json
@@ -51,13 +51,17 @@ class AddMealView(APIView):
                         meal=meal,
                         quantity=product_id_quant['quantity']
                     )
+
                 else:
                     return Response({'error': f'Invalid product id: {prod_id}'}, status=400)
 
+
         else:
             return Response({'error': 'Invalid token'}, status=400)
+        serializer = MealSerializerProductList(meal)
+        meal_json = serializer.data
 
-        return Response({'message': 'Meal added successfully', 'meal_id': meal.id})
+        return Response(meal_json)
 
 
 # get request with meal_id, product_id and quantity and add product to meal's product_list
@@ -177,7 +181,7 @@ class GetMealsBetweenDates(APIView):
 
                 user_meals = Meal.objects.filter(creator_user=user, creation_date__range=[start_date, end_date])
 
-                serializer = MealSerializerProductList_WithQuantity(user_meals, many=True)
+                serializer = MealSerializerProductList_WithElementData(user_meals, many=True)
 
                 user_meals_json = serializer.data
 
